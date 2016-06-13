@@ -3,6 +3,7 @@
   <persistence-unit name="VProvance.VinoPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>vprovance.vino.UsefullBatch</class>
+    <class>vprovance.vino.UserInfo</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://MKPK;databaseName=vProvance"/>
       <property name="javax.persistence.jdbc.user" value="exGens"/>

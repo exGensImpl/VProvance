@@ -6,28 +6,30 @@
 package vprovance.vino;
 
 import java.awt.event.WindowEvent;
-import java.math.BigDecimal;
-import java.sql.Date;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
  *
  * @author DexpUser
  */
-public class AddBatchDialog extends javax.swing.JDialog {
+public class EditUserDataDialog extends javax.swing.JDialog {
 
+    private boolean _isUserPasswordChaged = false;
+    private UserInfo _userInfo = DBConnection.instance().GetCurrentUserInfo();
+    
     /**
-     * Creates new form AddBatchDialog
+     * Creates new form EditUserDataDialog
      */
-    public AddBatchDialog(java.awt.Frame parent, boolean modal) {
+    public EditUserDataDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-    }
-    
-    private BatchTableModel model;
-    
-    public void setTableModel(BatchTableModel tableModel){
-        model = tableModel;
+        jTextField1.setText(_userInfo.getUsername());
+        jTextField2.setText(_userInfo.getName()); 
+        jComboBox1.setSelectedItem(_userInfo.getRole());
     }
 
     /**
@@ -39,12 +41,12 @@ public class AddBatchDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jTextField3 = new javax.swing.JTextField();
         jTextField1 = new javax.swing.JTextField();
         jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
-        jTextField5 = new javax.swing.JTextField();
-        jTextField6 = new javax.swing.JTextField();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jPasswordField1 = new javax.swing.JPasswordField();
+        jPasswordField2 = new javax.swing.JPasswordField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -52,23 +54,30 @@ public class AddBatchDialog extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-        jTextField1.setText("jTextField1");
-
-        jTextField2.setText("jTextField2");
 
         jTextField3.setText("jTextField3");
 
-        jTextField4.setText("jTextField4");
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jTextField5.setText("jTextField5");
+        jTextField1.setEditable(false);
+        jTextField1.setText("loginTF");
 
-        jTextField6.setText("jTextField6");
+        jTextField2.setText("nameTF");
 
-        jButton1.setText("Добавить");
+        jComboBox1.setModel(new UserRolesComboBoxModel());
+
+        jPasswordField1.setText("jPasswordField1");
+        jPasswordField1.setEnabled(false);
+        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPasswordField1ActionPerformed(evt);
+            }
+        });
+
+        jPasswordField2.setText("jPasswordField2");
+        jPasswordField2.setEnabled(false);
+
+        jButton1.setText("Сохранить");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -82,17 +91,15 @@ public class AddBatchDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel1.setText("Тип сырья:");
+        jLabel1.setText("Имя пользователя:");
 
-        jLabel2.setText("Кол-во:");
+        jLabel2.setText("ФИО:");
 
-        jLabel3.setText("Комментарий:");
+        jLabel3.setText("Должность:");
 
-        jLabel4.setText("Цена:");
+        jLabel4.setText("Новый пароль:");
 
-        jLabel5.setText("Дата изготовления:");
-
-        jLabel6.setText("Место расположения:");
+        jLabel5.setText("Повтор пароля:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -101,24 +108,20 @@ public class AddBatchDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTextField1)
+                    .addComponent(jTextField2)
+                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPasswordField1)
+                    .addComponent(jPasswordField2)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel6))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jTextField4, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jTextField5, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jTextField6, javax.swing.GroupLayout.Alignment.TRAILING)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 144, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 106, Short.MAX_VALUE)
                         .addComponent(jButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2)))
@@ -137,52 +140,45 @@ public class AddBatchDialog extends javax.swing.JDialog {
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPasswordField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton1))
+                    .addComponent(jButton1)
+                    .addComponent(jButton2))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        UsefullBatch batch = new UsefullBatch();
-        try {
-            batch.setResourceType(jTextField1.getText());
-            batch.setCount(Float.parseFloat(jTextField2.getText()));
-            batch.setMeasure("");
-            batch.setDescription(jTextField3.getText());
-            batch.setCost(BigDecimal.valueOf(Long.parseUnsignedLong(jTextField4.getText())));
-            batch.setProductionDate(Date.valueOf(jTextField5.getText()));
-            batch.setPlaceName(jTextField6.getText());  
-        
-            model.addBatch(batch);
-            processWindowEvent(new WindowEvent(this,WindowEvent.WINDOW_CLOSING));
-        }
-        catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
-        }  
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         processWindowEvent(new WindowEvent(this,WindowEvent.WINDOW_CLOSING));
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jPasswordField1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        _userInfo.setName(jTextField2.getText());
+        _userInfo.setRole((String)jComboBox1.getSelectedItem());
+        
+        try {
+            DBConnection.instance().SetCurrentUserInfo(_userInfo);
+            processWindowEvent(new WindowEvent(this,WindowEvent.WINDOW_CLOSING));
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -201,20 +197,20 @@ public class AddBatchDialog extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AddBatchDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(EditUserDataDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AddBatchDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(EditUserDataDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AddBatchDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(EditUserDataDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AddBatchDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(EditUserDataDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                AddBatchDialog dialog = new AddBatchDialog(new javax.swing.JFrame(), true);
+                EditUserDataDialog dialog = new EditUserDataDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -229,17 +225,16 @@ public class AddBatchDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
+    private javax.swing.JPasswordField jPasswordField1;
+    private javax.swing.JPasswordField jPasswordField2;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
-    private javax.swing.JTextField jTextField6;
     // End of variables declaration//GEN-END:variables
 }

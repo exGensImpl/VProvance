@@ -23,6 +23,7 @@ import java.util.List;
 class DBConnection {
     
     private static DBConnection _instance;
+    private static String _currentUserName;
     
     private Connection _connection;
     
@@ -31,10 +32,16 @@ class DBConnection {
         return _instance;
     }
     
+    public static String currentUserName()
+    {
+        return _currentUserName;
+    }
+    
     public static void SetConnection(String user, String password) 
             throws DataUnreachableException
     {
         _instance = new DBConnection(user, password);
+        _currentUserName = user;
     }
     
     public DBConnection(String user, String password) throws DataUnreachableException
@@ -93,6 +100,64 @@ class DBConnection {
             stmt.setString(5, batch.getPlaceName());
             stmt.setDate(6, (Date) batch.getProductionDate());
             stmt.setString(7, batch.getDescription());  
+            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            
+            stmt.execute(); 
+            
+            int res = stmt.getInt(1);
+            
+            if (res != 0)
+                throw new SQLException("Невозможно добавить партию: некорректные данные");
+            }
+    }
+    
+    public List<String> GetUserRoles()
+    {
+        List<String> res = new ArrayList<String>();
+        
+        try {
+            try (Statement stmt = _connection.createStatement()) {            
+                try (ResultSet rs = stmt.executeQuery("SELECT * FROM userTypes")) {
+                    while (rs.next()) {
+                        res.add(rs.getString("description"));
+                    }    
+                }
+            }
+        }
+        catch (SQLException ex) {
+            return null;
+        }
+        
+        return res;        
+    }
+    
+    public UserInfo GetCurrentUserInfo()
+    {
+        try {
+            try (Statement stmt = _connection.createStatement()) {            
+                try (ResultSet rs = stmt.executeQuery("SELECT * FROM CurrentUserInfo")) {
+                    while (rs.next()) {
+                        UserInfo result  = new UserInfo();
+                        
+                        result.setUsername(rs.getString("username"));
+                        result.setName(rs.getString("name"));
+                        result.setRole(rs.getString("role"));
+                        
+                        return result;
+                    }    
+                }
+            }
+        }
+        catch (SQLException ex) {   }  
+        
+        return null;
+    }
+    
+     public void SetCurrentUserInfo(UserInfo info) throws SQLException 
+    {
+        try (CallableStatement  stmt = _connection.prepareCall("{? = call [dbo].[SetCurrentUserInfo](?,?)}")) {
+            stmt.setString(2, info.getName());
+            stmt.setString(3, info.getRole());
             stmt.registerOutParameter(1, java.sql.Types.INTEGER);
             
             stmt.execute(); 

@@ -18,7 +18,6 @@ public class Main extends Application {
     
     boolean isAuthorized;
     
-    @Override
     public void start(Stage st){};
     
     /**

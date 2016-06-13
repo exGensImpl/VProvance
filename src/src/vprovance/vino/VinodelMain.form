@@ -36,6 +36,14 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem2ActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem3">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="&#x418;&#x437;&#x43c;&#x435;&#x43d;&#x438;&#x442;&#x44c; &#x434;&#x430;&#x43d;&#x43d;&#x44b;&#x435; &#x442;&#x435;&#x43a;&#x443;&#x449;&#x435;&#x433;&#x43e; &#x43f;&#x43e;&#x43b;&#x44c;&#x437;&#x43e;&#x432;&#x430;&#x442;&#x435;&#x43b;&#x44f;"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem3ActionPerformed"/>
+              </Events>
+            </MenuItem>
           </SubComponents>
         </Menu>
       </SubComponents>
