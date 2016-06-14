@@ -88,6 +88,8 @@ public class AuthDialog extends javax.swing.JDialog {
 
         jTextField.setText("exGens");
 
+        jPasswordField.setText("odessa55");
+
         jLabel3.setText("Имя пользователя:");
 
         jLabel4.setText("Пароль:");

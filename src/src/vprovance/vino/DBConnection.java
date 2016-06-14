@@ -153,7 +153,7 @@ class DBConnection {
         return null;
     }
     
-     public void SetCurrentUserInfo(UserInfo info) throws SQLException 
+    public void SetCurrentUserInfo(UserInfo info) throws SQLException 
     {
         try (CallableStatement  stmt = _connection.prepareCall("{? = call [dbo].[SetCurrentUserInfo](?,?)}")) {
             stmt.setString(2, info.getName());
@@ -166,6 +166,52 @@ class DBConnection {
             
             if (res != 0)
                 throw new SQLException("Невозможно добавить партию: некорректные данные");
+            }
+    }
+    
+    public List<Field> GetFields()
+    {
+        List<Field> res = new ArrayList<Field>();
+        
+        try {
+            try (Statement stmt = _connection.createStatement()) {            
+                try (ResultSet rs = stmt.executeQuery("SELECT * FROM UsefullFields")) {
+                    while (rs.next()) {
+                        Field field = new Field();
+
+                        field.setDescription(rs.getString("description"));
+                        field.setSquare(rs.getFloat("square"));
+                        field.setPrecipitation(rs.getFloat("precipitation"));
+                        field.setGroundType(rs.getString("ground type"));
+
+                        res.add(field);
+                    }    
+                }
+            }
+        }
+        catch (SQLException ex) {
+            return null;
+        }
+        
+        return res;        
+    }
+    
+    public void UpdateField(String oldName, Field newParams) throws SQLException 
+    {
+        try (CallableStatement  stmt = _connection.prepareCall("{? = call [dbo].[SetFieldInfo](?,?,?,?,?)}")) {
+            stmt.setString(2, oldName);
+            stmt.setString(3, newParams.getDescription());
+            stmt.setDouble(4, newParams.getSquare());
+            stmt.setDouble(5, newParams.getPrecipitation());
+            stmt.setString(6, newParams.getGroundType());
+            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            
+            stmt.execute(); 
+            
+            int res = stmt.getInt(1);
+            
+            if (res != 0)
+                throw new SQLException("Невозможно изменить информацию о поле: некорректные данные");
             }
     }
 }

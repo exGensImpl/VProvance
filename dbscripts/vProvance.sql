@@ -34,6 +34,26 @@ create table places
 	primary key (ID)
 );
 
+create table groundTypes
+(
+	ID tinyint not null identity(0,1),
+	description nvarchar(256) not null
+	primary key (ID)
+);
+
+create table fields
+(
+	ID smallint not null identity(0,1),
+	square float not null,
+	precipitation float not null,
+	groundTypeID tinyint not null,
+	placeID tinyint not null
+
+	primary key (ID),
+	foreign key (groundTypeID) references groundTypes,
+	foreign key (placeID) references places
+);
+
 create table resourses
 (
 	ID smallint not null identity(0,1),
@@ -106,12 +126,32 @@ GO
 
 /*===========Tables content============*/
 
+delete from fields;
+delete from users;
+delete from userTypes;
+delete from groundTypes;
+delete from transactions;
+delete from batches;
+delete from places;
+delete from resourses;
+delete from transactionsType;
+GO
+
 insert into transactionsType(description)
 values ('Приём товара'), ('Списание товара'), ('Продажа товара'), ('Перемещение товара');
 GO
 
 insert into places(description)
-values ('Склад'), ('Магазин'), ('Поле'), ('Производственный цех');
+values ('Склад'), ('Магазин'), ('Поле чудес'), ('Поле комплексных чисел'), ('Производственный цех');
+GO
+
+insert into groundTypes(description)
+values ('Песчаная'), ('Супесчаная'), ('Глинистая'), ('Суглинистая');
+GO
+
+insert into fields(placeID, square, precipitation, groundTypeID)
+values	(2, 200, 367, 2), 
+		(3, 232.4, 368, 1);
 GO
 
 insert into userTypes(description)
@@ -119,7 +159,11 @@ values ('Винодел'), ('Менеджер'), ('Продавец'), ('Зав�
 GO
 
 insert into resourses(description, groupID, measure, cost)
-values ('Виноград', null, 'кг', null), ('Мерло', 0, 'кг', 1.2), ('Шардонне', 0, 'кг', 2.4), ('Рислинг', 0, 'кг', 1.4);
+values	('Виноград', null, 'кг', null), 
+		('Мерло', 0, 'кг', 1.2), 
+		('Шардонне', 0, 'кг', 2.4), 
+		('Рислинг', 0, 'кг', 1.4), 
+		('Совиньон', 0, 'кг', 1.52);
 GO
 
 insert into users(name, roleID, userID)
@@ -217,6 +261,68 @@ BEGIN
 END
 GO
 
+IF OBJECT_ID(N'dbo.SetFieldInfo', N'U') IS NOT NULL 
+drop procedure dbo.SetFieldInfo
+GO
+create procedure dbo.SetFieldInfo
+	@OldName nvarchar(256),
+	@Name nvarchar(256) = null,
+	@Square float = null,
+	@Precipitation float = null,
+	@GroundType nvarchar(256) = null
+	AS
+BEGIN
+	SET NOCOUNT ON;
+
+	DECLARE @PlaceID smallint;
+	DECLARE @GroundTypeID smallint;
+
+	set @PlaceID = (select top(1) ID from places where description like @OldName);
+		
+	if (@PlaceID is null) return 1;
+
+	if(@GroundType is null)
+		set @GroundTypeID = (select top(1) groundTypeID from fields where placeID = @PlaceID);
+	else
+		set @GroundTypeID = (select top(1) ID from groundTypes where description like @GroundType);
+
+	if (@GroundTypeID is null) return 1;
+
+	if (@Square is null)
+		set @Square = (select top(1) square from fields where placeID = @PlaceID);
+
+	if (@Precipitation is null)
+		set @Precipitation = (select top(1) precipitation from fields where placeID = @PlaceID);
+
+	begin transaction	
+	update fields
+	set square = @Square, precipitation = @Precipitation, groundTypeID = @GroundTypeID
+	where placeID = @PlaceID;
+
+	if (@@ROWCOUNT = 0) 
+	BEGIN
+		rollback transaction
+		return 2;
+	END
+
+	if (@Name is not null and @OldName != @Name)
+	BEGIN
+		update places
+		set description = @Name
+		where description like @OldName;
+
+		if (@@ROWCOUNT = 0) 
+		BEGIN
+			rollback transaction
+			return 3;
+		END
+	END
+
+	commit transaction
+	return 0;
+END
+GO
+
 /*===========Views============*/
 
 IF OBJECT_ID(N'[dbo].[UsefullBatches]', N'U') IS NOT NULL 
@@ -255,6 +361,22 @@ FROM            dbo.transactions INNER JOIN
  				sys.sysusers AS sysusers_1 ON dbo.transactions.object = sysusers_1.uid
 GO
 
+IF OBJECT_ID(N'[dbo].[UsefullFields]', N'U') IS NOT NULL 
+DROP VIEW [dbo].[UsefullFields]
+GO
+CREATE VIEW [dbo].[UsefullFields]
+AS
+SELECT      dbo.places.description AS [description], 
+			dbo.fields.square,
+			dbo.fields.precipitation,
+			dbo.groundTypes.description as [ground type]
+
+FROM            dbo.fields INNER JOIN
+                dbo.places ON dbo.fields.placeID = dbo.places.ID INNER JOIN
+                dbo.groundTypes ON dbo.fields.groundTypeID = dbo.groundTypes.ID
+GO
+
+
 IF OBJECT_ID(N'[dbo].[CurrentUserInfo]', N'U') IS NOT NULL 
 DROP VIEW [dbo].[CurrentUserInfo]
 GO
@@ -274,6 +396,14 @@ EXEC	[dbo].[AddBatch]
 		@Count = 2,
 		@Cost = 23,
 		@PlaceName = 'Склад',
-		@ProductionDate = '2015.20.12',
+		@ProductionDate = '2016.20.06',
 		@Description = 'Вот и партия мерла. Я от счастья умерла'
+GO
+EXEC	[dbo].[AddBatch]
+		@ResourceName = 'Совиньон',
+		@Count = 3,
+		@Cost = 45,
+		@PlaceName = 'Склад',
+		@ProductionDate = '2016.20.06',
+		@Description = 'Нахрена мне пить бульон, я купила совиньон!'
 GO

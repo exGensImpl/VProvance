@@ -81,6 +81,9 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JPasswordField" name="jPasswordField">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="odessa55"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
