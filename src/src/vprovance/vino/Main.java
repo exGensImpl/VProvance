@@ -32,8 +32,12 @@ public class Main extends Application {
             public void windowClosing (WindowEvent e) {
                 if(ad.isValidAuthParams)
                 {
-                    VinodelMain v = new VinodelMain();
-                    v.setTitle("vProvance vinodel main frame");
+                    VinodelMain v = new VinodelMain(
+                            new SeddingRecommenderImpl(
+                                    DBConnection.instance(),
+                                    new StupidSeedingRecommendationProvider())
+                    );
+                    v.setTitle("Модуль винодела");
                     v.setVisible(true);
                 }
             }

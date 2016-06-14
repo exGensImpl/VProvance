@@ -43,6 +43,8 @@ public class Field implements Serializable {
     @Basic(optional = false)
     @Column(name = "ground type")
     private String groundType;
+    @Column(name = "seeding by")
+    private String seedingBy;
     @Id
     private Long ID;
 
@@ -79,6 +81,14 @@ public class Field implements Serializable {
 
     public void setGroundType(String groundType) {
         this.groundType = groundType;
+    }
+
+    public String getSeedingBy() {
+        return seedingBy;
+    }
+
+    public void setSeedingBy(String seedingBy) {
+        this.seedingBy = seedingBy;
     }
 
     public Long getID() {

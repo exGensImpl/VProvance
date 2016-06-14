@@ -5,16 +5,23 @@
  */
 package vprovance.vino;
 
+import java.util.stream.Collectors;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author DexpUser
  */
 public class VinodelMain extends javax.swing.JFrame {
 
+    private final ISeddingRecommender _seedingRecommender;
     /**
      * Creates new form VinodelMain
      */
-    public VinodelMain() {
+    public VinodelMain(ISeddingRecommender seedingRecommender) {
+        
+        _seedingRecommender = seedingRecommender;
+        
         initComponents();
     }
 
@@ -39,6 +46,8 @@ public class VinodelMain extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem4 = new javax.swing.JMenuItem();
 
         jMenu1.setText("jMenu1");
 
@@ -79,6 +88,18 @@ public class VinodelMain extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu3);
 
+        jMenu4.setText("Справка");
+
+        jMenuItem4.setText("Рекомендуемые даты посева");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem4);
+
+        jMenuBar1.add(jMenu4);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -105,6 +126,17 @@ public class VinodelMain extends javax.swing.JFrame {
         EditUserDataDialog ad = new EditUserDataDialog(null, true); 
         ad.setVisible(true);
     }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        String recommendation = _seedingRecommender
+                .GetRecommendations()
+                .map((rec) -> rec.GetField().getDescription() + " : " + rec.GetDate().toString())
+                .collect(Collectors.joining("\n"));
+        
+        JOptionPane.showMessageDialog(this, 
+                recommendation, 
+                "Рекомендуемыe даты посева", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -136,7 +168,7 @@ public class VinodelMain extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new VinodelMain().setVisible(true);
+                new VinodelMain(null).setVisible(true);
             }
         });
     }
@@ -145,10 +177,12 @@ public class VinodelMain extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;

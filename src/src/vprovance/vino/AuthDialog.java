@@ -86,7 +86,7 @@ public class AuthDialog extends javax.swing.JDialog {
             }
         });
 
-        jTextField.setText("exGens");
+        jTextField.setText("vinodel");
 
         jPasswordField.setText("odessa55");
 

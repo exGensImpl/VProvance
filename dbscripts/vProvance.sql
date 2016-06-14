@@ -41,20 +41,7 @@ create table groundTypes
 	primary key (ID)
 );
 
-create table fields
-(
-	ID smallint not null identity(0,1),
-	square float not null,
-	precipitation float not null,
-	groundTypeID tinyint not null,
-	placeID tinyint not null
-
-	primary key (ID),
-	foreign key (groundTypeID) references groundTypes,
-	foreign key (placeID) references places
-);
-
-create table resourses
+create table resources
 (
 	ID smallint not null identity(0,1),
 	description nvarchar(256) not null,
@@ -63,7 +50,22 @@ create table resourses
 	cost money,
 	
 	primary key (ID),
-	foreign key (groupID) references resourses
+	foreign key (groupID) references resources
+);
+
+create table fields
+(
+	ID smallint not null identity(0,1),
+	square float not null,
+	precipitation float not null,
+	seedingBy smallint,
+	groundTypeID tinyint not null,
+	placeID tinyint not null
+
+	primary key (ID),
+	foreign key (groundTypeID) references groundTypes,
+	foreign key (placeID) references places,
+	foreign key (seedingBy) references resources
 );
  
 create table batches
@@ -78,7 +80,7 @@ create table batches
 	lastMovingDate datetime,
 
 	primary key (ID),
-	foreign key (resourceID) references resourses,
+	foreign key (resourceID) references resources,
 	foreign key (placeID) references places
 );
 
@@ -133,7 +135,7 @@ delete from groundTypes;
 delete from transactions;
 delete from batches;
 delete from places;
-delete from resourses;
+delete from resources;
 delete from transactionsType;
 GO
 
@@ -158,7 +160,7 @@ insert into userTypes(description)
 values ('Винодел'), ('Менеджер'), ('Продавец'), ('Завхоз'), ('Администратор');
 GO
 
-insert into resourses(description, groupID, measure, cost)
+insert into resources(description, groupID, measure, cost)
 values	('Виноград', null, 'кг', null), 
 		('Мерло', 0, 'кг', 1.2), 
 		('Шардонне', 0, 'кг', 2.4), 
@@ -197,10 +199,10 @@ BEGIN
 	DECLARE @PlaceID tinyint;
 	DECLARE @TransactionTypeID smallint;	
 
-	set @ResourceID = (select top(1) ID from resourses where description like @ResourceName);
+	set @ResourceID = (select top(1) ID from resources where description like @ResourceName);
 	set @PlaceID = (select top(1) ID from places where description like @PlaceName);
 	set @TransactionTypeID = (select top(1) ID from transactionsType where description like 'Приём товара');
-	if (@Cost is null) set @Cost = @Count * (select top(1) cost from resourses where description like @ResourceName);
+	if (@Cost is null) set @Cost = @Count * (select top(1) cost from resources where description like @ResourceName);
 
 	if ((@ResourceID is null) or (@PlaceID is null) or (@TransactionTypeID is null)) return 1;
 
@@ -269,13 +271,15 @@ create procedure dbo.SetFieldInfo
 	@Name nvarchar(256) = null,
 	@Square float = null,
 	@Precipitation float = null,
-	@GroundType nvarchar(256) = null
+	@GroundType nvarchar(256) = null,
+	@SeedingBy nvarchar(256) = null
 	AS
 BEGIN
 	SET NOCOUNT ON;
 
 	DECLARE @PlaceID smallint;
 	DECLARE @GroundTypeID smallint;
+	DECLARE @SeedingByID smallint;
 
 	set @PlaceID = (select top(1) ID from places where description like @OldName);
 		
@@ -294,9 +298,12 @@ BEGIN
 	if (@Precipitation is null)
 		set @Precipitation = (select top(1) precipitation from fields where placeID = @PlaceID);
 
+	if (@SeedingBy is not null)
+		set @SeedingByID = (select top(1) ID from resources where description = @SeedingBy);
+
 	begin transaction	
 	update fields
-	set square = @Square, precipitation = @Precipitation, groundTypeID = @GroundTypeID
+	set square = @Square, precipitation = @Precipitation, groundTypeID = @GroundTypeID, seedingBy = @SeedingByID
 	where placeID = @PlaceID;
 
 	if (@@ROWCOUNT = 0) 
@@ -330,14 +337,14 @@ DROP VIEW [dbo].[UsefullBatches]
 GO
 CREATE VIEW [dbo].[UsefullBatches]
 AS
-SELECT      dbo.resourses.description AS [resource type], 
-			dbo.batches.count, dbo.resourses.measure, 
+SELECT      dbo.resources.description AS [resource type], 
+			dbo.batches.count, dbo.resources.measure, 
 			dbo.batches.description, dbo.batches.cost, 
 			dbo.batches.productionDate, 
 			dbo.places.description AS [place name]
 
 FROM            dbo.batches INNER JOIN
-                dbo.resourses ON dbo.batches.resourceID = dbo.resourses.ID INNER JOIN
+                dbo.resources ON dbo.batches.resourceID = dbo.resources.ID INNER JOIN
                 dbo.places ON dbo.batches.placeID = dbo.places.ID
 GO
 
@@ -348,15 +355,15 @@ CREATE VIEW [dbo].[UsefullTransactions]
 AS
 SELECT      dbo.transactions.date, 
 			dbo.transactionsType.description AS action, 
-			dbo.resourses.description AS resource, 
-			dbo.batches.count, dbo.resourses.measure, 
+			dbo.resources.description AS resource, 
+			dbo.batches.count, dbo.resources.measure, 
 			sys.sysusers.name AS subject, 
 			sysusers_1.name AS object
 
 FROM            dbo.transactions INNER JOIN
 				dbo.transactionsType ON dbo.transactions.typeID = dbo.transactionsType.ID INNER JOIN
 				dbo.batches ON dbo.transactions.batchID = dbo.batches.ID INNER JOIN
-				dbo.resourses ON dbo.batches.resourceID = dbo.resourses.ID INNER JOIN
+				dbo.resources ON dbo.batches.resourceID = dbo.resources.ID INNER JOIN
 				sys.sysusers ON dbo.transactions.subject = sys.sysusers.uid LEFT JOIN
  				sys.sysusers AS sysusers_1 ON dbo.transactions.object = sysusers_1.uid
 GO
@@ -369,11 +376,13 @@ AS
 SELECT      dbo.places.description AS [description], 
 			dbo.fields.square,
 			dbo.fields.precipitation,
-			dbo.groundTypes.description as [ground type]
+			dbo.groundTypes.description as [ground type],
+			dbo.resources.description as [seeding by]
 
 FROM            dbo.fields INNER JOIN
                 dbo.places ON dbo.fields.placeID = dbo.places.ID INNER JOIN
-                dbo.groundTypes ON dbo.fields.groundTypeID = dbo.groundTypes.ID
+                dbo.groundTypes ON dbo.fields.groundTypeID = dbo.groundTypes.ID LEFT JOIN
+				dbo.resources ON dbo.fields.seedingBy = dbo.resources.ID
 GO
 
 
@@ -406,4 +415,12 @@ EXEC	[dbo].[AddBatch]
 		@PlaceName = 'Склад',
 		@ProductionDate = '2016.20.06',
 		@Description = 'Нахрена мне пить бульон, я купила совиньон!'
+GO
+EXEC	[dbo].[AddBatch]
+		@ResourceName = 'Шардонне',
+		@Count = 10,
+		@Cost = 60,
+		@PlaceName = 'Поле чудес',
+		@ProductionDate = '2016.20.06',
+		@Description = 'Рислинг лучше шардонне, но налейте оба мне'
 GO

@@ -190,6 +190,7 @@ class DBConnection {
                         field.setSquare(rs.getFloat("square"));
                         field.setPrecipitation(rs.getFloat("precipitation"));
                         field.setGroundType(rs.getString("ground type"));
+                        field.setSeedingBy(rs.getString("seeding by"));
 
                         res.add(field);
                     }    
@@ -205,12 +206,13 @@ class DBConnection {
     
     public void UpdateField(String oldName, Field newParams) throws SQLException 
     {
-        try (CallableStatement  stmt = _connection.prepareCall("{? = call [dbo].[SetFieldInfo](?,?,?,?,?)}")) {
+        try (CallableStatement  stmt = _connection.prepareCall("{? = call [dbo].[SetFieldInfo](?,?,?,?,?,?)}")) {
             stmt.setString(2, oldName);
             stmt.setString(3, newParams.getDescription());
             stmt.setDouble(4, newParams.getSquare());
             stmt.setDouble(5, newParams.getPrecipitation());
             stmt.setString(6, newParams.getGroundType());
+            stmt.setString(7, newParams.getSeedingBy());
             stmt.registerOutParameter(1, java.sql.Types.INTEGER);
             
             stmt.execute(); 
