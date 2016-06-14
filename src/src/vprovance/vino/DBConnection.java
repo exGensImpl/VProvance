@@ -38,10 +38,17 @@ class DBConnection {
     }
     
     public static void SetConnection(String user, String password) 
-            throws DataUnreachableException
+            throws DataUnreachableException, UnsupportedOperationException
     {
+        if (_instance != null) throw new UnsupportedOperationException("Connection already established");
+        
         _instance = new DBConnection(user, password);
         _currentUserName = user;
+    }
+    
+    public static void ResetConnection() {
+        _instance = null;
+        _currentUserName = null;
     }
     
     public DBConnection(String user, String password) throws DataUnreachableException

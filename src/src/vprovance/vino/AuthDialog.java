@@ -138,6 +138,9 @@ public class AuthDialog extends javax.swing.JDialog {
             DBConnection.SetConnection(
                     jTextField.getText(),
                     jPasswordField.getText());
+            
+            if(!"Винодел".equals(DBConnection.instance().GetCurrentUserInfo().getRole()))
+                throw new UnsupportedOperationException();
                     
             isValidAuthParams = true;
             processWindowEvent(new WindowEvent(this,WindowEvent.WINDOW_CLOSING));
@@ -148,6 +151,9 @@ public class AuthDialog extends javax.swing.JDialog {
                 JOptionPane.showMessageDialog(this, "Неправильные логин или пароль", "Ошибка", JOptionPane.ERROR_MESSAGE);
             if(ex.GetReason() == DataUnreachableReason.DriverNotFound)
                 JOptionPane.showMessageDialog(this, "Не найден драйвер для базы данных", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        } catch (UnsupportedOperationException ex) {
+            DBConnection.ResetConnection();
+            JOptionPane.showMessageDialog(this, "Данный пользователь не является виноделом", "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
         
     }//GEN-LAST:event_jButtonActionPerformed

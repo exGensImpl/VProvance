@@ -13,8 +13,8 @@ USE vProvance;
 create login vinodel with password = 'vinodel'
 create user vinodel from login vinodel
 GO
-sp_addrolemember @rolename = 'vinodel',  
-    @membername = 'exGens';  	
+sp_addrolemember @rolename = 'db_owner',  
+    @membername = 'vinodel';  	
 GO
 
 create login exGens with password = 'exGens'
