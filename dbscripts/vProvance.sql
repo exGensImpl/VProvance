@@ -17,6 +17,13 @@ sp_addrolemember @rolename = 'db_owner',
     @membername = 'vinodel';  	
 GO
 
+create login seller with password = 'seller'
+create user seller from login seller
+GO
+sp_addrolemember @rolename = 'db_owner',  
+    @membername = 'seller';  	
+GO
+
 create login exGens with password = 'exGens'
 create user exGens from login exGens
 GO
@@ -78,6 +85,7 @@ create table batches
 	placeID tinyint not null,
 	productionDate datetime,
 	lastMovingDate datetime,
+	isSended bit not null default(0)
 
 	primary key (ID),
 	foreign key (resourceID) references resources,
@@ -140,7 +148,7 @@ delete from transactionsType;
 GO
 
 insert into transactionsType(description)
-values ('Приём товара'), ('Списание товара'), ('Продажа товара'), ('Перемещение товара');
+values ('Приём товара'), ('Списание товара'), ('Продажа товара'), ('Запрос на перемещение товара'), ('Подтверждение перемещения товара');
 GO
 
 insert into places(description)
@@ -218,6 +226,46 @@ BEGIN
 
 	insert into transactions(batchID, typeID, date, subject, object)
 	values (@@IDENTITY, @TransactionTypeID, CURRENT_TIMESTAMP, USER_ID(CURRENT_USER), null)
+
+	commit transaction
+	return 0;
+END
+GO
+
+IF OBJECT_ID(N'dbo.SendBatchTo', N'U') IS NOT NULL 
+drop procedure dbo.SendBatchTo
+GO
+create procedure dbo.SendBatchTo
+	@BatchId int,
+	@SubbjectName nvarchar(256)
+	AS
+BEGIN
+	SET NOCOUNT ON;
+
+	if((select top(1) isSended from batches where ID = @BatchId) != 0)
+		return 3;
+
+	DECLARE @TransactionTypeID smallint;	
+	DECLARE @Seller smallint;	
+
+	set @TransactionTypeID = (select top(1) ID from transactionsType where description like 'Запрос на перемещение товара');
+	set @Seller = USER_ID(@SubbjectName)
+
+	if ((@Seller is null) or (@TransactionTypeID is null)) return 1;
+
+	begin transaction	
+	update batches 
+	set isSended = 1
+	where ID = @BatchId
+
+	if (@@ROWCOUNT = 0) 
+	BEGIN
+		rollback transaction
+		return 2;
+	END
+
+	insert into transactions(batchId, typeID, date, subject, object)
+	values (@BatchId, @TransactionTypeID, CURRENT_TIMESTAMP, USER_ID(CURRENT_USER), @Seller)
 
 	commit transaction
 	return 0;

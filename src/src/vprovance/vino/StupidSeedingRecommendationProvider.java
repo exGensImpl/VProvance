@@ -15,6 +15,6 @@ public class StupidSeedingRecommendationProvider implements ISeedingRecommendati
 
     @Override
     public Date GetRecommendation(Field field) {
-        return new Date(2016,6,6);
+        return new Date(116,6,6);
     }    
 }

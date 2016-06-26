@@ -78,6 +78,7 @@ class DBConnection {
                     while (rs.next()) {
                         UsefullBatch batch = new UsefullBatch();
 
+                        batch.setId(rs.getLong("id"));
                         batch.setResourceType(rs.getString("resource type"));
                         batch.setCount(rs.getFloat("count"));
                         batch.setMeasure(rs.getString("measure"));
@@ -116,6 +117,24 @@ class DBConnection {
             if (res != 0)
                 throw new SQLException("Невозможно добавить партию: некорректные данные");
             }
+    }
+    
+    public void SendBatchToSeller(long batchId) throws SQLException 
+    {
+        try (CallableStatement  stmt = _connection.prepareCall("{? = call dbo.SendBatchTo(?,?)}")) {
+            stmt.setLong(2, batchId);
+            stmt.setString(3, "seller");
+            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            
+            stmt.execute(); 
+            
+            int res = stmt.getInt(1);
+            
+            if (res == 3)
+                throw new SQLException("Невозможно переместить партию: партия товара уже отправлена");            
+            else if (res != 0)
+                throw new SQLException("Невозможно переместить партию: некорректные данные");
+        }
     }
     
     public List<String> GetUserRoles()

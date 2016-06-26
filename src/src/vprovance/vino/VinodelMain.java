@@ -5,8 +5,15 @@
  */
 package vprovance.vino;
 
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 
 /**
  *
@@ -23,6 +30,8 @@ public class VinodelMain extends javax.swing.JFrame {
         _seedingRecommender = seedingRecommender;
         
         initComponents();
+        
+        jTable1.removeColumn(jTable1.getColumnModel().getColumn(0));
     }
 
     /**
@@ -45,6 +54,8 @@ public class VinodelMain extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -78,6 +89,15 @@ public class VinodelMain extends javax.swing.JFrame {
         });
         jMenu3.add(jMenuItem2);
 
+        jMenuItem5.setText("Отправить партию товара в магазин");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem5);
+        jMenu3.add(jSeparator1);
+
         jMenuItem3.setText("Изменить данные текущего пользователя");
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -106,7 +126,10 @@ public class VinodelMain extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -128,15 +151,28 @@ public class VinodelMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+        
         String recommendation = _seedingRecommender
                 .GetRecommendations()
-                .map((rec) -> rec.GetField().getDescription() + " : " + rec.GetDate().toString())
+                .map((rec) -> rec.GetField().getDescription() + " : " + df.format(rec.GetDate()))
                 .collect(Collectors.joining("\n"));
         
         JOptionPane.showMessageDialog(this, 
                 recommendation, 
                 "Рекомендуемыe даты посева", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+        int row = jTable1.getSelectedRow();
+        Object id = jTable1.getModel().getValueAt(row, 0);
+        
+        try {
+            DBConnection.instance().SendBatchToSeller((long)id);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -183,8 +219,10 @@ public class VinodelMain extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
