@@ -5,6 +5,7 @@
  */
 package vprovance.vino;
 
+import VProvance.Core.UI.EditUserDataDialog;
 import VProvance.Core.Database.DBConnection;
 import java.sql.SQLException;
 import java.text.DateFormat;

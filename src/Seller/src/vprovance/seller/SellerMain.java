@@ -5,6 +5,8 @@
  */
 package vprovance.seller;
 
+import VProvance.Core.UI.EditUserDataDialog;
+
 /**
  *
  * @author DexpUser
@@ -27,7 +29,35 @@ public class SellerMain extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        EditUserMI = new javax.swing.JMenuItem();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jMenu1.setText("Файл");
+
+        jMenuItem1.setText("Выход");
+        jMenu1.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Редактирование");
+
+        EditUserMI.setText("Редактирование профиля");
+        EditUserMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EditUserMIActionPerformed(evt);
+            }
+        });
+        jMenu2.add(EditUserMI);
+        EditUserMI.getAccessibleContext().setAccessibleDescription("");
+
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -37,11 +67,16 @@ public class SellerMain extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGap(0, 279, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void EditUserMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditUserMIActionPerformed
+        EditUserDataDialog ad = new EditUserDataDialog(null, true); 
+        ad.setVisible(true);
+    }//GEN-LAST:event_EditUserMIActionPerformed
 
     /**
      * @param args the command line arguments
@@ -79,5 +114,10 @@ public class SellerMain extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem EditUserMI;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     // End of variables declaration//GEN-END:variables
 }
