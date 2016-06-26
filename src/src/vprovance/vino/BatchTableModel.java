@@ -114,9 +114,14 @@ public class BatchTableModel implements TableModel  {
     
     public void addBatch(UsefullBatch batch) throws SQLException
     {
-        DBConnection.instance().AddBatch(batch);       
-        
+        DBConnection.instance().AddBatch(batch);    
+        Refresh();    
+    }
+    
+    public void Refresh()
+    {
         _batches = DBConnection.instance().GetBatches();
+        
         for (TableModelListener listener : _listeners){
             listener.tableChanged(new TableModelEvent(this));
         }    

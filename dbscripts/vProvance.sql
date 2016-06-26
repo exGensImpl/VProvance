@@ -385,7 +385,8 @@ DROP VIEW [dbo].[UsefullBatches]
 GO
 CREATE VIEW [dbo].[UsefullBatches]
 AS
-SELECT      dbo.resources.description AS [resource type], 
+SELECT      dbo.batches.ID AS [id],
+			dbo.resources.description AS [resource type], 
 			dbo.batches.count, dbo.resources.measure, 
 			dbo.batches.description, dbo.batches.cost, 
 			dbo.batches.productionDate, 
@@ -394,6 +395,22 @@ SELECT      dbo.resources.description AS [resource type],
 FROM            dbo.batches INNER JOIN
                 dbo.resources ON dbo.batches.resourceID = dbo.resources.ID INNER JOIN
                 dbo.places ON dbo.batches.placeID = dbo.places.ID
+GO
+
+IF OBJECT_ID(N'[dbo].[VinemakerBatches]', N'U') IS NOT NULL 
+DROP VIEW [dbo].VinemakerBatches
+GO
+CREATE VIEW [dbo].VinemakerBatches
+AS
+SELECT DISTINCT dbo.UsefullBatches.*
+
+FROM	dbo.UsefullBatches LEFT JOIN
+		dbo.transactions ON dbo.UsefullBatches.ID = dbo.transactions.batchID
+
+WHERE	(dbo.UsefullBatches.[place name] like 'Поле%' or
+		 dbo.UsefullBatches.[place name] like 'Склад')
+		and 
+		 typeID != (select top (1) ID from transactionsType where description like 'Запрос на перемещение товара')
 GO
 
 IF OBJECT_ID(N'[dbo].[UsefullTransactions]', N'U') IS NOT NULL 

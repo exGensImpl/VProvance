@@ -70,11 +70,23 @@ class DBConnection {
     
     public List<UsefullBatch> GetBatches()
     {
-        List<UsefullBatch> res = new ArrayList<UsefullBatch>();
+        String role = GetCurrentUserInfo().getRole();
+        
+        if ("Менеджер".equals(role))
+            return GetBatches("UsefullBatches");
+        else if ("Винодел".equals(role))
+            return GetBatches("VinemakerBatches");      
+        
+        return new ArrayList<>();
+    }
+    
+    private List<UsefullBatch> GetBatches(String viewName)
+    {
+        List<UsefullBatch> res = new ArrayList<>();
         
         try {
             try (Statement stmt = _connection.createStatement()) {            
-                try (ResultSet rs = stmt.executeQuery("SELECT * FROM UsefullBatches")) {
+                try (ResultSet rs = stmt.executeQuery("SELECT * FROM " + viewName)) {
                     while (rs.next()) {
                         UsefullBatch batch = new UsefullBatch();
 
@@ -93,10 +105,10 @@ class DBConnection {
             }
         }
         catch (SQLException ex) {
-            return null;
+            return new ArrayList<>();
         }
         
-        return res;        
+        return res;
     }
     
     public void AddBatch(UsefullBatch batch) throws SQLException 

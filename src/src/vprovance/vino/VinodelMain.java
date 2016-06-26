@@ -169,6 +169,7 @@ public class VinodelMain extends javax.swing.JFrame {
         
         try {
             DBConnection.instance().SendBatchToSeller((long)id);
+            ((BatchTableModel)jTable1.getModel()).Refresh();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
