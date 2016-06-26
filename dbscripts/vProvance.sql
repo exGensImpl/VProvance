@@ -183,7 +183,11 @@ values ('Пётр Винодел',
 		
 		('Кирилл',
 		(select top(1) id from userTypes where description like 'Администратор'), 
-		(select top(1) sid from sys.syslogins where name like 'exGens'));
+		(select top(1) sid from sys.syslogins where name like 'exGens')),
+		
+		('Жанна ''Агузарова'' Продавец',
+		(select top(1) id from userTypes where description like 'Продавец'), 
+		(select top(1) sid from sys.syslogins where name like 'seller'));
 GO
 
 
@@ -404,13 +408,13 @@ CREATE VIEW [dbo].VinemakerBatches
 AS
 SELECT DISTINCT dbo.UsefullBatches.*
 
-FROM	dbo.UsefullBatches LEFT JOIN
-		dbo.transactions ON dbo.UsefullBatches.ID = dbo.transactions.batchID
+FROM	dbo.UsefullBatches RIGHT JOIN
+		dbo.batches ON dbo.UsefullBatches.ID = dbo.batches.ID
 
 WHERE	(dbo.UsefullBatches.[place name] like 'Поле%' or
 		 dbo.UsefullBatches.[place name] like 'Склад')
 		and 
-		 typeID != (select top (1) ID from transactionsType where description like 'Запрос на перемещение товара')
+		 isSended = 0
 GO
 
 IF OBJECT_ID(N'[dbo].[UsefullTransactions]', N'U') IS NOT NULL 
