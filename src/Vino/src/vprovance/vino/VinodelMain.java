@@ -7,15 +7,12 @@ package vprovance.vino;
 
 import VProvance.Core.UI.EditUserDataDialog;
 import VProvance.Core.Database.DBConnection;
+import VProvance.Core.UI.BatchTableModel;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
 
 /**
  *
@@ -68,7 +65,7 @@ public class VinodelMain extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable1.setModel(new BatchTableModel(DBConnection.instance().GetBatches()));
+        jTable1.setModel(new BatchTableModel());
         jScrollPane1.setViewportView(jTable1);
 
         jTabbedPane1.addTab("Партии товара", jScrollPane1);
@@ -143,7 +140,7 @@ public class VinodelMain extends javax.swing.JFrame {
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         AddBatchDialog ad = new AddBatchDialog(null, true); 
-        ad.setTableModel((BatchTableModel)jTable1.getModel());
+        ad.setTableModel((WinemakerBatchTableModel)jTable1.getModel());
         ad.setVisible(true);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 

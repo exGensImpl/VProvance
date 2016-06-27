@@ -79,6 +79,10 @@ public class DBConnection {
         
         return new ArrayList<>();
     }
+
+    public List<UsefullBatch> GetArrivedBatches() {
+        return GetBatches("ArrivedBatches");
+    }
     
     private List<UsefullBatch> GetBatches(String viewName)
     {

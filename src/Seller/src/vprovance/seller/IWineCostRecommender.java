@@ -5,10 +5,13 @@
  */
 package vprovance.seller;
 
+import java.util.List;
+
 /**
  *
  * @author DexpUser
  */
 public interface IWineCostRecommender {
     
+    public List<WineCostRecommendation> GetRecommendation(List<WineCost> currentCosts);
 }

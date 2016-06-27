@@ -9,6 +9,21 @@ package vprovance.seller;
  *
  * @author DexpUser
  */
-class WineCost {
+public class WineCost {
     
+    private final String _type;
+    private final double _cost;
+    
+    public WineCost(String type, double cost) {
+        _type = type;
+        _cost = cost;
+    }
+    
+    public String getType() {
+        return _type;
+    }
+    
+    public double getCost() {
+        return _cost;
+    }
 }

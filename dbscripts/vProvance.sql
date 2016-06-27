@@ -107,6 +107,7 @@ create table transactions
 	date datetime not null,
 	subject smallint not null,
 	object smallint,
+	approved bit
 
 	primary key (ID),
 	foreign key (batchID) references batches,
@@ -268,8 +269,8 @@ BEGIN
 		return 2;
 	END
 
-	insert into transactions(batchId, typeID, date, subject, object)
-	values (@BatchId, @TransactionTypeID, CURRENT_TIMESTAMP, USER_ID(CURRENT_USER), @Seller)
+	insert into transactions(batchId, typeID, date, subject, object, approved)
+	values (@BatchId, @TransactionTypeID, CURRENT_TIMESTAMP, USER_ID(CURRENT_USER), @Seller, 0)
 
 	commit transaction
 	return 0;
@@ -415,6 +416,23 @@ WHERE	(dbo.UsefullBatches.[place name] like 'Поле%' or
 		 dbo.UsefullBatches.[place name] like 'Склад')
 		and 
 		 isSended = 0
+GO
+
+IF OBJECT_ID(N'[dbo].[ArrivedBatches]', N'U') IS NOT NULL 
+DROP VIEW [dbo].[ArrivedBatches]
+GO
+CREATE VIEW [dbo].[ArrivedBatches]
+AS
+select	dbo.UsefullBatches.*
+from	dbo.transactions INNER JOIN
+		dbo.UsefullBatches ON dbo.transactions.batchID = dbo.UsefullBatches.ID INNER JOIN
+		dbo.transactionsType ON dbo.transactions.typeID = dbo.transactionsType.ID
+
+where	dbo.transactionsType.description = 'Запрос на перемещение товара'
+		and
+		object = USER_ID('seller')
+		and
+		approved = 0
 GO
 
 IF OBJECT_ID(N'[dbo].[UsefullTransactions]', N'U') IS NOT NULL 

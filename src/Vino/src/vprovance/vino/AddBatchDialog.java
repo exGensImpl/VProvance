@@ -25,9 +25,9 @@ public class AddBatchDialog extends javax.swing.JDialog {
         initComponents();
     }
     
-    private BatchTableModel model;
+    private WinemakerBatchTableModel model;
     
-    public void setTableModel(BatchTableModel tableModel){
+    public void setTableModel(WinemakerBatchTableModel tableModel){
         model = tableModel;
     }
 

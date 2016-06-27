@@ -5,7 +5,7 @@
  */
 package vprovance.seller;
 
-import VProvance.Core.UI.EditUserDataDialog;
+import VProvance.Core.UI.*;
 
 /**
  *
@@ -18,6 +18,7 @@ public class SellerMain extends javax.swing.JFrame {
      */
     public SellerMain() {
         initComponents();
+        jTable1.removeColumn(jTable1.getColumnModel().getColumn(0));
     }
 
     /**
@@ -29,6 +30,8 @@ public class SellerMain extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -36,6 +39,9 @@ public class SellerMain extends javax.swing.JFrame {
         EditUserMI = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jTable1.setModel(new BatchTableModel(new ArrivedBatchSource()));
+        jScrollPane1.setViewportView(jTable1);
 
         jMenu1.setText("Файл");
 
@@ -63,11 +69,11 @@ public class SellerMain extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 279, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
         );
 
         pack();
@@ -119,5 +125,7 @@ public class SellerMain extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }

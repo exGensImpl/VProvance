@@ -3,14 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package vprovance.seller;
+package VProvance.Core.UI;
+
+import VProvance.Core.Database.UsefullBatch;
+import java.util.List;
 
 /**
  *
  * @author DexpUser
  */
-public class WineCostRecommendation extends WineCost {
-    public WineCostRecommendation(String type, double cost){
-        super(type, cost);
-    }
+public interface IBatchSource {
+    public List<UsefullBatch> GetBatches();
 }
