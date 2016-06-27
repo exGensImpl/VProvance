@@ -1,5 +1,8 @@
-IF OBJECT_ID(N'vProvance', N'U') IS NOT NULL 
-DROP DATABASE [vProvance]
+USE master
+GO
+ALTER DATABASE vProvance SET SINGLE_USER WITH ROLLBACK IMMEDIATE 
+GO
+exec sp_dbremove 'vProvance'
 GO
 
 CREATE DATABASE vProvance
@@ -104,10 +107,11 @@ create table transactions
 	ID int not null identity(0,1),
 	batchID int not null,
 	typeID smallint not null,
-	date datetime not null,
+	time datetime not null,
 	subject smallint not null,
 	object smallint,
-	approved bit
+	accepted bit,
+	acceptTime datetime
 
 	primary key (ID),
 	foreign key (batchID) references batches,
@@ -229,7 +233,7 @@ BEGIN
 		return 2;
 	END
 
-	insert into transactions(batchID, typeID, date, subject, object)
+	insert into transactions(batchID, typeID, time, subject, object)
 	values (@@IDENTITY, @TransactionTypeID, CURRENT_TIMESTAMP, USER_ID(CURRENT_USER), null)
 
 	commit transaction
@@ -269,7 +273,7 @@ BEGIN
 		return 2;
 	END
 
-	insert into transactions(batchId, typeID, date, subject, object, approved)
+	insert into transactions(batchId, typeID, time, subject, object, accepted)
 	values (@BatchId, @TransactionTypeID, CURRENT_TIMESTAMP, USER_ID(CURRENT_USER), @Seller, 0)
 
 	commit transaction
@@ -383,6 +387,62 @@ BEGIN
 END
 GO
 
+IF OBJECT_ID(N'dbo.AcceptBatch', N'U') IS NOT NULL 
+drop procedure dbo.AcceptBatch
+GO
+create procedure dbo.AcceptBatch
+	@BatchID int
+	AS
+BEGIN
+	SET NOCOUNT ON;
+
+	DECLARE @TransID int;
+
+	set @TransID = (
+		select	transactions.ID 
+		from	transactions INNER JOIN
+				transactionsType ON transactions.typeID = transactionsType.ID
+		where	object = USER_ID()
+				and
+				accepted = 0
+				and
+				batchID = @BatchID
+				and 
+				transactionsType.description like 'Запрос на перемещение товара');
+		
+	if (@@ROWCOUNT != 1) return 1;
+
+	begin transaction
+
+	update transactions
+	set accepted = 1, acceptTime = CURRENT_TIMESTAMP
+	where ID = @TransID 
+
+	if (@@ROWCOUNT != 1) 
+	begin
+		rollback transaction;
+		return 2;
+	end
+
+	if((select role from CurrentUserInfo) like 'Продавец')
+	begin
+		update batches
+		set placeID = (select top(1) ID from places where description like 'Магазин'),
+			isSended = 0
+		where ID = @BatchID 
+	end
+
+	if (@@ROWCOUNT != 1)
+	begin
+		rollback transaction;
+		return 2;
+	end
+
+	commit transaction
+	return 0;
+END
+GO
+
 /*===========Views============*/
 
 IF OBJECT_ID(N'[dbo].[UsefullBatches]', N'U') IS NOT NULL 
@@ -403,9 +463,9 @@ FROM            dbo.batches INNER JOIN
 GO
 
 IF OBJECT_ID(N'[dbo].[VinemakerBatches]', N'U') IS NOT NULL 
-DROP VIEW [dbo].VinemakerBatches
+DROP VIEW [dbo].[VinemakerBatches]
 GO
-CREATE VIEW [dbo].VinemakerBatches
+CREATE VIEW [dbo].[VinemakerBatches]
 AS
 SELECT DISTINCT dbo.UsefullBatches.*
 
@@ -414,6 +474,21 @@ FROM	dbo.UsefullBatches RIGHT JOIN
 
 WHERE	(dbo.UsefullBatches.[place name] like 'Поле%' or
 		 dbo.UsefullBatches.[place name] like 'Склад')
+		and 
+		 isSended = 0
+GO
+
+IF OBJECT_ID(N'[dbo].[SellerBatches]', N'U') IS NOT NULL 
+DROP VIEW [dbo].[SellerBatches]
+GO
+CREATE VIEW [dbo].[SellerBatches]
+AS
+SELECT DISTINCT dbo.UsefullBatches.*
+
+FROM	dbo.UsefullBatches RIGHT JOIN
+		dbo.batches ON dbo.UsefullBatches.ID = dbo.batches.ID
+
+WHERE	(dbo.UsefullBatches.[place name] like 'Магазин')
 		and 
 		 isSended = 0
 GO
@@ -430,9 +505,9 @@ from	dbo.transactions INNER JOIN
 
 where	dbo.transactionsType.description = 'Запрос на перемещение товара'
 		and
-		object = USER_ID('seller')
+		object = USER_ID()
 		and
-		approved = 0
+		accepted = 0
 GO
 
 IF OBJECT_ID(N'[dbo].[UsefullTransactions]', N'U') IS NOT NULL 
@@ -440,12 +515,14 @@ DROP VIEW [dbo].[UsefullTransactions]
 GO
 CREATE VIEW [dbo].[UsefullTransactions]
 AS
-SELECT      dbo.transactions.date, 
+SELECT      dbo.transactions.time, 
 			dbo.transactionsType.description AS action, 
 			dbo.resources.description AS resource, 
 			dbo.batches.count, dbo.resources.measure, 
 			sys.sysusers.name AS subject, 
-			sysusers_1.name AS object
+			sysusers_1.name AS object,
+			dbo.transactions.accepted,
+			dbo.transactions.acceptTime as [accepted time]
 
 FROM            dbo.transactions INNER JOIN
 				dbo.transactionsType ON dbo.transactions.typeID = dbo.transactionsType.ID INNER JOIN

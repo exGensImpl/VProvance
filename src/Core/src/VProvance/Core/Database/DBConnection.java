@@ -70,14 +70,18 @@ public class DBConnection {
     
     public List<UsefullBatch> GetBatches()
     {
-        String role = GetCurrentUserInfo().getRole();
+        String role = GetCurrentUserInfo().getRole();        
         
-        if ("Менеджер".equals(role))
-            return GetBatches("UsefullBatches");
-        else if ("Винодел".equals(role))
-            return GetBatches("VinemakerBatches");      
-        
-        return new ArrayList<>();
+        switch (role) {
+            case "Менеджер":
+                return GetBatches("UsefullBatches");
+            case "Винодел":
+                return GetBatches("VinemakerBatches"); 
+            case "Продавец":
+                return GetBatches("SellerBatches");
+            default:
+                return new ArrayList<>();
+            }
     }
 
     public List<UsefullBatch> GetArrivedBatches() {
@@ -153,9 +157,26 @@ public class DBConnection {
         }
     }
     
+    public void AcceptBatch(long batchId) throws SQLException
+    {
+        try (CallableStatement  stmt = _connection.prepareCall("{? = call dbo.AcceptBatch(?)}")) {
+            stmt.setLong(2, batchId);
+            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            
+            stmt.execute(); 
+            
+            int res = stmt.getInt(1);
+            
+            if (res == 1)
+                throw new SQLException("Невозможно подтвердить получение партии: данная партия не направлена текущему пользователю");
+            else if (res != 0)
+                throw new SQLException("Невозможно подтвердить получение партии");
+        }       
+    }
+    
     public List<String> GetUserRoles()
     {
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
         
         try {
             try (Statement stmt = _connection.createStatement()) {            
@@ -213,7 +234,7 @@ public class DBConnection {
     
     public List<Field> GetFields()
     {
-        List<Field> res = new ArrayList<Field>();
+        List<Field> res = new ArrayList<>();
         
         try {
             try (Statement stmt = _connection.createStatement()) {            
