@@ -74,7 +74,7 @@ public class VinodelMain extends javax.swing.JFrame {
             }
         });
 
-        jTable1.setModel(new BatchTableModel());
+        jTable1.setModel(new WinemakerBatchTableModel());
         jScrollPane1.setViewportView(jTable1);
 
         jTabbedPane1.addTab("Партии товара", jScrollPane1);

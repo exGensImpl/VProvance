@@ -153,7 +153,7 @@ public class AuthDialog extends javax.swing.JDialog {
             UserInfo ui = DBConnection.instance().GetCurrentUserInfo();
             
             if (ui == null) 
-                throw new IllegalArgumentException ();
+                throw new IllegalArgumentException();
             
             if(!_expectedRole.equals(ui.getRole()))
                 throw new UnsupportedOperationException();
@@ -172,7 +172,7 @@ public class AuthDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, "Данный пользователь не принадлежит роли: " + _expectedRole, "Ошибка", JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException ex) {
             DBConnection.ResetConnection();
-            JOptionPane.showMessageDialog(this, "Не найдены некторове данные о такойм пользователе. Обратитесь к администратору.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Не найдены некторые данные о таком пользователе. Обратитесь к администратору.", "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
         
     }//GEN-LAST:event_jButtonActionPerformed

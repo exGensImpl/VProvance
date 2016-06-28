@@ -12,6 +12,8 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -30,7 +32,7 @@ public class Main extends Application {
      */
     public static void main(String[] args) {
         
-        AuthDialog ad = new AuthDialog("Винодел", null, true);     
+        AuthDialog ad = new AuthDialog("Винодел", null, true);  
         
         ad.addWindowListener (new WindowAdapter () {
             @Override

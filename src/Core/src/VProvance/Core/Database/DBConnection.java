@@ -193,6 +193,38 @@ public class DBConnection {
         }       
     }
     
+    public List<Transaction> GetTransactions()
+    {
+        List<Transaction> res = new ArrayList<>();
+        
+        try {
+            try (Statement stmt = _connection.createStatement()) {            
+                try (ResultSet rs = stmt.executeQuery("SELECT * FROM UsefullTransactions")) {
+                    while (rs.next()) {
+                        Transaction trans = new Transaction();
+
+                        trans.setTime(rs.getDate("time"));
+                        trans.setAction(rs.getString("action"));
+                        trans.setResource(rs.getString("resource"));
+                        trans.setCount(rs.getFloat("count"));
+                        trans.setMeasure(rs.getString("measure"));
+                        trans.setSubject(rs.getString("subject"));
+                        trans.setObject(rs.getString("object"));
+                        trans.setAccepted(rs.getBoolean("accepted"));
+                        trans.setAcceptedTime(rs.getDate("accepted time"));
+
+                        res.add(trans);
+                    }    
+                }
+            }
+        }
+        catch (SQLException ex) {
+            return new ArrayList<>();
+        }
+        
+        return res;
+    }
+    
     public List<String> GetUserRoles()
     {
         List<String> res = new ArrayList<>();

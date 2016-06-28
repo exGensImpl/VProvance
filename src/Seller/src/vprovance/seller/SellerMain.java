@@ -22,6 +22,7 @@ public class SellerMain extends javax.swing.JFrame {
     public SellerMain() {
         initComponents();
         ArrivedBatchTable.removeColumn(ArrivedBatchTable.getColumnModel().getColumn(0));
+        AllBatchTable.removeColumn(AllBatchTable.getColumnModel().getColumn(0));
     }
 
     /**
