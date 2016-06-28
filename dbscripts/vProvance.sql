@@ -28,6 +28,13 @@ sp_addrolemember @rolename = 'db_owner',
 GO
 
 create login exGens with password = 'exGens'
+GO
+sp_addsrvrolemember @loginame= 'exGens',
+					@rolename = 'securityadmin'
+GO
+sp_addsrvrolemember @loginame= 'exGens',
+					@rolename = 'sysadmin'
+GO
 create user exGens from login exGens
 GO
 sp_addrolemember @rolename = 'db_owner',  
@@ -119,6 +126,23 @@ create table transactions
 );
 GO
 
+create table contragents
+(
+	ID smallint not null identity(0,1),
+	description nvarchar(256) not null
+
+	primary key (ID)
+);
+
+create table contragentsTransactions
+(
+	contragentID smallint not null,
+	transactionID int not null
+
+	foreign key (contragentID) references contragents,
+    foreign key (transactionID) references transactions
+);
+
 create table userTypes
 (
 	ID smallint not null identity(0,1),
@@ -184,15 +208,15 @@ GO
 insert into users(name, roleID, userID)
 values ('Пётр Винодел',
 		(select top(1) id from userTypes where description like 'Винодел'), 
-		(select top(1) sid from sys.syslogins where name like 'vinodel')),
+		(select top(1) sid from sys.sysusers where name like 'vinodel')),
 		
 		('Кирилл',
 		(select top(1) id from userTypes where description like 'Администратор'), 
-		(select top(1) sid from sys.syslogins where name like 'exGens')),
+		(select top(1) sid from sys.sysusers where name like 'dbo')),
 		
 		('Жанна ''Агузарова'' Продавец',
 		(select top(1) id from userTypes where description like 'Продавец'), 
-		(select top(1) sid from sys.syslogins where name like 'seller'));
+		(select top(1) sid from sys.sysusers where name like 'seller'));
 GO
 
 
@@ -597,13 +621,13 @@ DROP VIEW [dbo].[CurrentUserInfo]
 GO
 CREATE VIEW [dbo].[CurrentUserInfo]
 AS
-SELECT	sys.syslogins.name as username, 
+SELECT	sys.sysusers.name as username, 
 		users.name, 
 		userTypes.description as role
 FROM    users INNER JOIN
 		userTypes ON users.roleID = userTypes.ID
-		INNER JOIN sys.syslogins ON users.userID = sys.syslogins.sid
-WHERE	sys.syslogins.name = CURRENT_USER
+		INNER JOIN sys.sysusers ON users.userID = sys.sysusers.sid
+WHERE	sys.sysusers.name = CURRENT_USER
 GO
 
 EXEC	[dbo].[AddBatch]

@@ -225,6 +225,62 @@ public class DBConnection {
         return res;
     }
     
+    public void CreateUser(String username, String password, String role) throws SQLException {
+        if(username == null || username.isEmpty())
+            throw new IllegalArgumentException("username");
+        
+        if(password == null || password.isEmpty())
+            throw new IllegalArgumentException("password");
+        
+        if(role == null || role.isEmpty())
+            throw new IllegalArgumentException("role");
+        
+        try (CallableStatement  stmt = _connection.prepareCall("{? = call sp_addlogin(?,?,?)}")) {
+            stmt.setString(2, username);
+            stmt.setString(3, password);
+            stmt.setString(4, "vProvance");
+            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            
+            stmt.execute();            
+            int res = stmt.getInt(1);
+            
+            if (res != 0)
+                throw new SQLException("Невозможно добавить нового пользователя");
+        }
+        
+        try (CallableStatement  stmt = _connection.prepareCall("{? = call sp_adduser(?,?)}")) {
+            stmt.setString(2, username);
+            stmt.setString(3, username);
+            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            
+            stmt.execute();            
+            int res = stmt.getInt(1);
+            
+            if (res != 0)
+                throw new SQLException("Невозможно добавить нового пользователя");
+        }
+        
+        try (CallableStatement  stmt = _connection.prepareCall("{? = call sp_addrolemember(?,?)}")) {
+            stmt.setString(2, "db_owner");
+            stmt.setString(3, username);
+            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            
+            stmt.execute();            
+            int res = stmt.getInt(1);
+            
+            if (res != 0)
+                throw new SQLException("Невозможно добавить нового пользователя");
+        }
+        
+        try (Statement stmt = _connection.createStatement()) {
+            stmt.executeUpdate(
+                "insert into users(name, roleID, userID)" +
+                "values ('" + username + "'," +
+                        "(select top(1) id from userTypes where description like '" + role + "'), "+
+                        "(select top(1) sid from sys.syslogins where name like '" + username + "'))");
+        }
+    }
+    
     public List<String> GetUserRoles()
     {
         List<String> res = new ArrayList<>();
