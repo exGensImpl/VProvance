@@ -6,9 +6,12 @@
 package vprovance.vino;
 
 import VProvance.Core.Database.DBConnection;
+import VProvance.Core.Notifications.IWarningNotificator;
 import VProvance.Core.UI.AuthDialog;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -34,10 +37,17 @@ public class Main extends Application {
             public void windowClosing (WindowEvent e) {
                 if(ad.isValidAuthParams())
                 {
-                    VinodelMain v = new VinodelMain(
+                    ISeddingRecommender recommender = 
                             new SeddingRecommenderImpl(
                                     DBConnection.instance(),
-                                    new StupidSeedingRecommendationProvider())
+                                    new StupidSeedingRecommendationProvider());
+                    
+                    List<IWarningNotificator> notificators = new ArrayList<IWarningNotificator>();
+                    notificators.add(new SeedingWarningNotificator(recommender));
+                    
+                    VinodelMain v = new VinodelMain(
+                            recommender,
+                            notificators
                     );
                     v.setTitle("Модуль винодела");
                     v.setVisible(true);

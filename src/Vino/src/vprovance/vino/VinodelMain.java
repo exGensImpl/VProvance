@@ -7,10 +7,12 @@ package vprovance.vino;
 
 import VProvance.Core.UI.EditUserDataDialog;
 import VProvance.Core.Database.DBConnection;
+import VProvance.Core.Notifications.IWarningNotificator;
 import VProvance.Core.UI.BatchTableModel;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 
@@ -21,12 +23,14 @@ import javax.swing.JOptionPane;
 public class VinodelMain extends javax.swing.JFrame {
 
     private final ISeddingRecommender _seedingRecommender;
+    List<IWarningNotificator> _notificators;
     /**
      * Creates new form VinodelMain
      */
-    public VinodelMain(ISeddingRecommender seedingRecommender) {
+    public VinodelMain(ISeddingRecommender seedingRecommender, List<IWarningNotificator> notificators) {
         
         _seedingRecommender = seedingRecommender;
+        _notificators = notificators;
         
         initComponents();
         
@@ -64,6 +68,11 @@ public class VinodelMain extends javax.swing.JFrame {
         jMenuItem1.setText("jMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         jTable1.setModel(new BatchTableModel());
         jScrollPane1.setViewportView(jTable1);
@@ -174,6 +183,12 @@ public class VinodelMain extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        for(IWarningNotificator n : _notificators)
+            for(String message : n.GetNotification())
+                JOptionPane.showMessageDialog(this, message, "Внимание", JOptionPane.WARNING_MESSAGE);
+    }//GEN-LAST:event_formWindowOpened
+
     /**
      * @param args the command line arguments
      */
@@ -204,7 +219,7 @@ public class VinodelMain extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new VinodelMain(null).setVisible(true);
+                new VinodelMain(null, null).setVisible(true);
             }
         });
     }
