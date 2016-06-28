@@ -81,7 +81,7 @@ public class DBConnection {
                 return GetBatches("SellerBatches");
             default:
                 return new ArrayList<>();
-            }
+        }
     }
 
     public List<UsefullBatch> GetArrivedBatches() {
@@ -171,6 +171,25 @@ public class DBConnection {
                 throw new SQLException("Невозможно подтвердить получение партии: данная партия не направлена текущему пользователю");
             else if (res != 0)
                 throw new SQLException("Невозможно подтвердить получение партии");
+        }       
+    }
+    
+    public void Sale(long batchId) throws SQLException
+    {
+        try (CallableStatement  stmt = _connection.prepareCall("{? = call dbo.SaleWine(?)}")) {
+            stmt.setLong(2, batchId);
+            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            
+            stmt.execute(); 
+            
+            int res = stmt.getInt(1);
+            
+            if (res == 1)
+                throw new SQLException("Невозможно зарегистрировать продажу партии: данная партия не находится в магазине");
+            else if (res == 3)
+                throw new SQLException("Невозможно зарегистрировать продажу партии: вы не продавец");
+            else if (res != 0)
+                throw new SQLException("Невозможно зарегистрировать продажу партии");
         }       
     }
     

@@ -44,6 +44,7 @@ public class SellerMain extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         EditUserMI = new javax.swing.JMenuItem();
         AcceptMI = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -82,6 +83,14 @@ public class SellerMain extends javax.swing.JFrame {
             }
         });
         jMenu2.add(AcceptMI);
+
+        jMenuItem2.setText("Подтвердить продажу партии");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem2);
 
         jMenuBar1.add(jMenu2);
 
@@ -123,6 +132,20 @@ public class SellerMain extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_AcceptMIActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        int row = AllBatchTable.getSelectedRow();
+        if (row == -1) return;
+        
+        Object id = AllBatchTable.getModel().getValueAt(row, 0);
+        
+        try {
+            DBConnection.instance().Sale((long)id);
+            ((BatchTableModel)AllBatchTable.getModel()).Refresh();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -168,6 +191,7 @@ public class SellerMain extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;

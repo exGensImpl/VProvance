@@ -157,7 +157,7 @@ values ('Приём товара'), ('Списание товара'), ('Про�
 GO
 
 insert into places(description)
-values ('Склад'), ('Магазин'), ('Поле чудес'), ('Поле комплексных чисел'), ('Производственный цех');
+values ('Склад'), ('Магазин'), ('Поле чудес'), ('Поле комплексных чисел'), ('Производственный цех'), ('Утилизировано'), ('Продано');
 GO
 
 insert into groundTypes(description)
@@ -443,6 +443,48 @@ BEGIN
 END
 GO
 
+IF OBJECT_ID(N'dbo.SaleWine', N'U') IS NOT NULL 
+drop procedure dbo.SaleWine
+GO
+create procedure dbo.SaleWine
+	@BatchId int
+	AS
+BEGIN
+	SET NOCOUNT ON;
+
+	if((select top(1) role from CurrentUserInfo) != 'Продавец')
+		return 3;
+
+	if((select top(1) count(*) from SellerBatches where ID = @BatchId) != 1)
+		return 1;
+
+	DECLARE @TransactionTypeID smallint;
+	DECLARE @SaledID smallint;
+
+	set @TransactionTypeID = (select top(1) ID from transactionsType where description like 'Продажа товара');
+	set @SaledID = (select top(1) ID from places where description like 'Продано');
+	
+	if ((@SaledID is null) or (@TransactionTypeID is null)) return 2;
+
+	begin transaction	
+	update batches 
+	set placeID = @SaledID
+	where ID = @BatchId
+
+	if (@@ROWCOUNT = 0) 
+	BEGIN
+		rollback transaction
+		return 2;
+	END
+
+	insert into transactions(batchId, typeID, time, subject)
+	values (@BatchId, @TransactionTypeID, CURRENT_TIMESTAMP, USER_ID())
+
+	commit transaction
+	return 0;
+END
+GO
+
 /*===========Views============*/
 
 IF OBJECT_ID(N'[dbo].[UsefullBatches]', N'U') IS NOT NULL 
@@ -585,6 +627,18 @@ EXEC	[dbo].[AddBatch]
 		@Count = 10,
 		@Cost = 60,
 		@PlaceName = 'Поле чудес',
-		@ProductionDate = '2016.20.06',
+		@ProductionDate = '2016.27.06',
 		@Description = 'Рислинг лучше шардонне, но налейте оба мне'
+GO
+EXEC	[dbo].[AddBatch]
+		@ResourceName = 'Рислинг',
+		@Count = 10,
+		@Cost = 80,
+		@PlaceName = 'Поле чудес',
+		@ProductionDate = '2016.23.06',
+		@Description = 'Рислинг лучше шардонне, но налейте оба мне'
+GO
+EXEC	[dbo].[SendBatchTo]
+		@BatchId = 1,
+		@SubbjectName = N'seller'
 GO
