@@ -3,6 +3,7 @@
   <persistence-unit name="VProvance.CorePU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>VProvance.Core.Database.Transaction</class>
+    <class>VProvance.Core.Database.WineSale</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://MKPK;databaseName=vProvance"/>
       <property name="javax.persistence.jdbc.user" value="exGens"/>

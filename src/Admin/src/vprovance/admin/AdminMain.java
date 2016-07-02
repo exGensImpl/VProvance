@@ -43,7 +43,7 @@ public class AdminMain extends javax.swing.JFrame {
         TransactionsTable.setModel(new TransactionTableModel());
         jScrollPane1.setViewportView(TransactionsTable);
 
-        jMenu1.setText("File");
+        jMenu1.setText("Файл");
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Редактировать");

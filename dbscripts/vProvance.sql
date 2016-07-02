@@ -476,7 +476,8 @@ create procedure dbo.SaleWine
 BEGIN
 	SET NOCOUNT ON;
 
-	if((select top(1) role from CurrentUserInfo) != 'Продавец')
+	if((select top(1) role from CurrentUserInfo) != 'Продавец' and
+	   (select top(1) role from CurrentUserInfo) != 'Администратор')
 		return 3;
 
 	if((select top(1) count(*) from SellerBatches where ID = @BatchId) != 1)
@@ -576,6 +577,22 @@ where	dbo.transactionsType.description = 'Запрос на перемещени
 		accepted = 0
 GO
 
+IF OBJECT_ID(N'[dbo].[WineSales]', N'U') IS NOT NULL 
+DROP VIEW [dbo].[WineSales]
+GO
+CREATE VIEW [dbo].[WineSales]
+AS
+select	resources.description as [wine type],
+		DATEFROMPARTS(YEAR(time), MONTH(time), 1) as [month],
+		sum(batches.cost) as [cost]
+from	transactions INNER JOIN 
+		batches on transactions.batchID = batches.ID INNER JOIN
+		resources on batches.resourceID = resources.ID INNER JOIN
+		transactionsType on transactions.typeID = transactionsType.ID
+where	transactionsType.description like 'Продажа товара' 
+group by resources.description, DATEFROMPARTS(YEAR(time), MONTH(time), 1);
+GO
+
 IF OBJECT_ID(N'[dbo].[UsefullTransactions]', N'U') IS NOT NULL 
 DROP VIEW [dbo].[UsefullTransactions]
 GO
@@ -630,6 +647,8 @@ FROM    users INNER JOIN
 WHERE	sys.sysusers.name = CURRENT_USER
 GO
 
+
+/*===================Content=========================*/
 EXEC	[dbo].[AddBatch]
 		@ResourceName = 'Мерло',
 		@Count = 2,
@@ -665,4 +684,58 @@ GO
 EXEC	[dbo].[SendBatchTo]
 		@BatchId = 1,
 		@SubbjectName = N'seller'
+GO
+
+EXEC	[dbo].[AddBatch]
+		@ResourceName = 'Мерло',
+		@Count = 2,
+		@Cost = 23,
+		@PlaceName = 'Магазин',
+		@ProductionDate = '2016.20.06',
+		@Description = 'Магазин 1'
+GO
+EXEC	[dbo].[AddBatch]
+		@ResourceName = 'Мерло',
+		@Count = 3,
+		@Cost = 45,
+		@PlaceName = 'Магазин',
+		@ProductionDate = '2016.20.06',
+		@Description = 'Магазин 2'
+GO
+EXEC	[dbo].[AddBatch]
+		@ResourceName = 'Шардонне',
+		@Count = 10,
+		@Cost = 60,
+		@PlaceName = 'Магазин',
+		@ProductionDate = '2016.27.06',
+		@Description = 'Магазин 3'
+GO
+EXEC	[dbo].[AddBatch]
+		@ResourceName = 'Рислинг',
+		@Count = 10,
+		@Cost = 80,
+		@PlaceName = 'Магазин',
+		@ProductionDate = '2016.23.06',
+		@Description = 'Магазин 4'
+GO
+
+declare @ID int;
+set @ID = (select top(1) ID from [dbo].[batches] where description like 'Магазин 1');
+EXEC	[SaleWine]
+		@BatchId = @ID
+GO
+declare @ID int;
+set @ID = (select top(1) ID from [dbo].[batches] where description like 'Магазин 2');
+EXEC	[dbo].[SaleWine]
+		@BatchId = @ID
+GO
+declare @ID int;
+set @ID = (select top(1) ID from [dbo].[batches] where description like 'Магазин 3');
+EXEC	[dbo].[SaleWine]
+		@BatchId = @ID
+GO
+declare @ID int;
+set @ID = (select top(1) ID from [dbo].[batches] where description like 'Магазин 4');
+EXEC	[dbo].[SaleWine]
+		@BatchId = @ID
 GO

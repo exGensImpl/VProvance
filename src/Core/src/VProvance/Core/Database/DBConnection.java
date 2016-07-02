@@ -386,4 +386,30 @@ public class DBConnection {
                 throw new SQLException("Невозможно изменить информацию о поле: некорректные данные");
             }
     }
+    
+    public List<WineSale> GetWineSales()
+    {
+        List<WineSale> res = new ArrayList<>();
+        
+        try {
+            try (Statement stmt = _connection.createStatement()) {            
+                try (ResultSet rs = stmt.executeQuery("SELECT * FROM WineSales")) {
+                    while (rs.next()) {
+                        WineSale sale = new WineSale();
+
+                        sale.setWineType(rs.getString("wine type"));
+                        sale.setMonth(rs.getDate("month"));
+                        sale.setCost(rs.getBigDecimal("cost"));
+
+                        res.add(sale);
+                    }    
+                }
+            }
+        }
+        catch (SQLException ex) {
+            return null;
+        }
+        
+        return res;        
+    }
 }
