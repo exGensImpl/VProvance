@@ -5,6 +5,7 @@
  */
 package vprovance.admin;
 
+import VProvance.Core.UI.TransactionTableModel;
 import VProvance.Core.UI.DateRenderer;
 import java.sql.Date;
 

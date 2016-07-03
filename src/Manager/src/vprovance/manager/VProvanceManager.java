@@ -3,33 +3,35 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package vprovance.admin;
+package vprovance.manager;
 
 import VProvance.Core.UI.AuthDialog;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 /**
  *
  * @author DexpUser
  */
-public class VProvanceAdmin extends Application {
+public class VProvanceManager extends Application {
     
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
-        AuthDialog ad = new AuthDialog("Администратор", null, true);     
+        AuthDialog ad = new AuthDialog("Менеджер", null, true);     
         
         ad.addWindowListener (new WindowAdapter () {
             @Override
             public void windowClosing (WindowEvent e) {
                 if(ad.isValidAuthParams())
                 {
-                    AdminMain s = new AdminMain();
-                    s.setTitle("Модуль администратора");
+                    ManagerMain s = new ManagerMain();
+                    s.setTitle("Модуль менеджера");
                     s.setVisible(true);
                 }
             }
