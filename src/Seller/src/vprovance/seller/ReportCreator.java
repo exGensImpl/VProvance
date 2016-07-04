@@ -74,8 +74,8 @@ class WineSaleReport extends ArrayList<WineSaleEntry> {
     }
     
     public CategoryChart getChart() {
-            // Create Chart
-            CategoryChart chart = new CategoryChartBuilder().width(600).height(500)
+        // Create Chart
+        CategoryChart chart = new CategoryChartBuilder().width(600).height(500)
                     .title("Динамика продаж вина").xAxisTitle("Месяц").yAxisTitle("Сумма").build();
 
         chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNW);
@@ -90,16 +90,16 @@ class WineSaleReport extends ArrayList<WineSaleEntry> {
                     months,
                     getMonthsCreditByWine(wineName, months, df));
         });
-            return chart;
-        }
+        return chart;
+    }
     
-        private List<BigDecimal> getMonthsCreditByWine(String wineType, List<String> months, DateFormat df) {
+    private List<BigDecimal> getMonthsCreditByWine(String wineType, List<String> months, DateFormat df) {
         
-            return Arrays.asList(months.stream().map(m -> this
-                            .stream()
-                            .filter(e -> (df.format(e.getDate()).equals(m) &&
-                                         e.getDescription().equals(wineType)))
-                            .map(e -> e.getCost()).reduce(BigDecimal.ZERO, (d,a) -> a))
-                            .toArray(s -> new BigDecimal[s]));        
-        }
+        return Arrays.asList(months.stream().map(m -> this
+                    .stream()
+                    .filter(e -> (df.format(e.getDate()).equals(m) &&
+                                e.getDescription().equals(wineType)))
+                    .map(e -> e.getCost()).reduce(BigDecimal.ZERO, (d,a) -> a))
+                    .toArray(s -> new BigDecimal[s]));        
+    }
 }

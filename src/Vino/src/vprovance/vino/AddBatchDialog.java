@@ -8,6 +8,7 @@ package vprovance.vino;
 import VProvance.Core.Database.UsefullBatch;
 import java.awt.event.WindowEvent;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.sql.Date;
 import javax.swing.JOptionPane;
 
@@ -17,12 +18,15 @@ import javax.swing.JOptionPane;
  */
 public class AddBatchDialog extends javax.swing.JDialog {
 
+    SimpleDateFormat dateFormat = new SimpleDateFormat();
     /**
      * Creates new form AddBatchDialog
      */
     public AddBatchDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        dateFormat.applyPattern("dd.MM.yyyy");
+        ProductionDateTextField.setText(dateFormat.format(new java.util.Date()));
     }
     
     private WinemakerBatchTableModel model;
@@ -44,7 +48,7 @@ public class AddBatchDialog extends javax.swing.JDialog {
         jTextField2 = new javax.swing.JTextField();
         jTextField3 = new javax.swing.JTextField();
         jTextField4 = new javax.swing.JTextField();
-        jTextField5 = new javax.swing.JTextField();
+        ProductionDateTextField = new javax.swing.JTextField();
         jTextField6 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -57,17 +61,7 @@ public class AddBatchDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jTextField1.setText("jTextField1");
-
-        jTextField2.setText("jTextField2");
-
-        jTextField3.setText("jTextField3");
-
-        jTextField4.setText("jTextField4");
-
-        jTextField5.setText("jTextField5");
-
-        jTextField6.setText("jTextField6");
+        jTextField2.setToolTipText("");
 
         jButton1.setText("Добавить");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -116,7 +110,7 @@ public class AddBatchDialog extends javax.swing.JDialog {
                             .addComponent(jTextField2, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jTextField4, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jTextField5, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(ProductionDateTextField, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jTextField6, javax.swing.GroupLayout.Alignment.TRAILING)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 144, Short.MAX_VALUE)
@@ -146,7 +140,7 @@ public class AddBatchDialog extends javax.swing.JDialog {
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ProductionDateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -170,7 +164,11 @@ public class AddBatchDialog extends javax.swing.JDialog {
             batch.setMeasure("");
             batch.setDescription(jTextField3.getText());
             batch.setCost(BigDecimal.valueOf(Long.parseUnsignedLong(jTextField4.getText())));
-            batch.setProductionDate(Date.valueOf(jTextField5.getText()));
+                       
+            java.util.Date productionDate = dateFormat.parse(ProductionDateTextField.getText());
+            batch.setProductionDate(new Date(productionDate.getYear(),
+                                             productionDate.getMonth(),
+                                             productionDate.getDay()));
             batch.setPlaceName(jTextField6.getText());  
         
             model.addBatch(batch);
@@ -228,6 +226,7 @@ public class AddBatchDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField ProductionDateTextField;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
@@ -240,7 +239,6 @@ public class AddBatchDialog extends javax.swing.JDialog {
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField6;
     // End of variables declaration//GEN-END:variables
 }

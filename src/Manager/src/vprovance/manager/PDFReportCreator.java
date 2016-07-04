@@ -37,7 +37,7 @@ public class PDFReportCreator {
     public void CreateTransactionsReportOnPDF(String filepath) throws Exception {
 
         Document document = new Document();
-        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         
         BaseFont bf1 = BaseFont.createFont("c:/Windows/Fonts/times.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         Font font1 = new Font(bf1, FONT_SIZE_BIG);
@@ -82,13 +82,17 @@ public class PDFReportCreator {
         t.addCell(new PdfPCell(new Phrase("Время подтверждения", tableFont)));
         
         for(Transaction trans : _connection.GetTransactions()) {
-            t.addCell(new PdfPCell(new Phrase(trans.getTime().toString(), tableFont)));
+            t.addCell(new PdfPCell(new Phrase(df.format(trans.getTime()), tableFont)));
             t.addCell(new PdfPCell(new Phrase(trans.getAction(), tableFont)));
             t.addCell(new PdfPCell(new Phrase(trans.getResource(), tableFont)));
             t.addCell(new PdfPCell(new Phrase(String.valueOf(trans.getCount()), tableFont)));
             t.addCell(new PdfPCell(new Phrase(trans.getMeasure(), tableFont)));
             t.addCell(new PdfPCell(new Phrase(trans.getSubject(), tableFont)));
-            t.addCell(new PdfPCell(new Phrase(String.format("%s", trans.getObject()), tableFont)));
+            
+            String objectDescription = "Без адресата";
+            if(trans.getObject() != null)
+                objectDescription = trans.getObject();            
+            t.addCell(new PdfPCell(new Phrase(objectDescription, tableFont)));
             
             String acceptedString = "Нет";
             if(trans.getObject() == null) acceptedString = "";

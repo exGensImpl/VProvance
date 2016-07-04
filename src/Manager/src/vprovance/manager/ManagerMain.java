@@ -1,12 +1,14 @@
 package vprovance.manager;
 
 import VProvance.Core.Database.DBConnection;
+import VProvance.Core.UI.DateRenderer;
 import VProvance.Core.UI.EditUserDataDialog;
 import VProvance.Core.UI.TransactionTableModel;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -28,6 +30,7 @@ public class ManagerMain extends javax.swing.JFrame {
      */
     public ManagerMain() {
         initComponents();
+        TransactionsTable.setDefaultRenderer(Date.class, new DateRenderer("dd.MM.yyyy HH:mm:ss"));
     }
 
     /**
@@ -40,9 +43,10 @@ public class ManagerMain extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        TransactionsTable = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
         EdiUserMenu = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
@@ -50,10 +54,19 @@ public class ManagerMain extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable1.setModel(new TransactionTableModel());
-        jScrollPane1.setViewportView(jTable1);
+        TransactionsTable.setModel(new TransactionTableModel());
+        jScrollPane1.setViewportView(TransactionsTable);
 
         jMenu1.setText("Файл");
+
+        jMenuItem2.setText("Обновить данные");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem2);
+
         jMenuBar1.add(jMenu1);
 
         EdiUserMenu.setText("Редактирование");
@@ -86,16 +99,11 @@ public class ManagerMain extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(15, Short.MAX_VALUE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 11, Short.MAX_VALUE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
         );
 
         pack();
@@ -117,6 +125,10 @@ public class ManagerMain extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Создать отчёт не получилось: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_GetTransactionReportActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        ((TransactionTableModel)TransactionsTable.getModel()).Refresh();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -156,11 +168,12 @@ public class ManagerMain extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu EdiUserMenu;
     private javax.swing.JMenuItem GetTransactionReport;
+    private javax.swing.JTable TransactionsTable;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }

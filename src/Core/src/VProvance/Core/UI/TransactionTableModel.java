@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
@@ -21,6 +22,7 @@ import javax.swing.table.TableModel;
 public class TransactionTableModel  implements TableModel {
     
     private final Set<TableModelListener> _listeners = new HashSet<>();
+    DBConnection _source = DBConnection.instance();
     List<Transaction> _trans = DBConnection.instance().GetTransactions();
     
     @Override
@@ -105,6 +107,15 @@ public class TransactionTableModel  implements TableModel {
     @Override
     public void removeTableModelListener(TableModelListener l) {
         _listeners.remove(l);
+    }
+    
+    public void Refresh()
+    {
+        _trans = _source.GetTransactions();
+        
+        for (TableModelListener listener : _listeners){
+            listener.tableChanged(new TableModelEvent(this));
+        }    
     }
 }
     

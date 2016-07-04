@@ -20,7 +20,7 @@ public class AdminMain extends javax.swing.JFrame {
      */
     public AdminMain() {
         initComponents();
-        TransactionsTable.setDefaultRenderer(Date.class, new DateRenderer());
+        TransactionsTable.setDefaultRenderer(Date.class, new DateRenderer("dd.MM.yyyy HH:mm:ss"));
     }
 
     /**

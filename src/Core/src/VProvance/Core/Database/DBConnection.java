@@ -78,7 +78,9 @@ public class DBConnection {
             case "Винодел":
                 return GetBatches("VinemakerBatches"); 
             case "Продавец":
-                return GetBatches("SellerBatches");
+                return GetBatches("SellerBatches"); 
+            case "Кладовщик":
+                return GetBatches("StockmanBatches");
             default:
                 return new ArrayList<>();
         }
@@ -139,11 +141,11 @@ public class DBConnection {
             }
     }
     
-    public void SendBatchToSeller(long batchId) throws SQLException 
+    public void SendBatchTo(long batchId, String receiver) throws SQLException 
     {
         try (CallableStatement  stmt = _connection.prepareCall("{? = call dbo.SendBatchTo(?,?)}")) {
             stmt.setLong(2, batchId);
-            stmt.setString(3, "seller");
+            stmt.setString(3, receiver);
             stmt.registerOutParameter(1, java.sql.Types.INTEGER);
             
             stmt.execute(); 
@@ -203,7 +205,7 @@ public class DBConnection {
                     while (rs.next()) {
                         Transaction trans = new Transaction();
 
-                        trans.setTime(rs.getDate("time"));
+                        trans.setTime(rs.getTimestamp("time"));
                         trans.setAction(rs.getString("action"));
                         trans.setResource(rs.getString("resource"));
                         trans.setCount(rs.getFloat("count"));
@@ -211,7 +213,7 @@ public class DBConnection {
                         trans.setSubject(rs.getString("subject"));
                         trans.setObject(rs.getString("object"));
                         trans.setAccepted(rs.getBoolean("accepted"));
-                        trans.setAcceptedTime(rs.getDate("accepted time"));
+                        trans.setAcceptedTime(rs.getTimestamp("accepted time"));
 
                         res.add(trans);
                     }    

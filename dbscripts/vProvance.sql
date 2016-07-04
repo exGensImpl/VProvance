@@ -27,6 +27,20 @@ sp_addrolemember @rolename = 'db_owner',
     @membername = 'seller';  	
 GO
 
+create login stockman with password = 'stockman'
+create user stockman from login stockman
+GO
+sp_addrolemember @rolename = 'db_owner',  
+    @membername = 'stockman';  	
+GO
+
+create login manager with password = 'manager'
+create user manager from login manager
+GO
+sp_addrolemember @rolename = 'db_owner',  
+    @membername = 'manager';  	
+GO
+
 create login exGens with password = 'exGens'
 GO
 sp_addsrvrolemember @loginame= 'exGens',
@@ -194,7 +208,7 @@ values	(2, 200, 367, 2),
 GO
 
 insert into userTypes(description)
-values ('Винодел'), ('Менеджер'), ('Продавец'), ('Завхоз'), ('Администратор');
+values ('Винодел'), ('Менеджер'), ('Продавец'), ('Кладовщик'), ('Администратор');
 GO
 
 insert into resources(description, groupID, measure, cost)
@@ -214,9 +228,17 @@ values ('Пётр Винодел',
 		(select top(1) id from userTypes where description like 'Администратор'), 
 		(select top(1) sid from sys.sysusers where name like 'dbo')),
 		
+		('Апполинарий ''Рахитичный'' Кладовщик',
+		(select top(1) id from userTypes where description like 'Кладовщик'), 
+		(select top(1) sid from sys.sysusers where name like 'stockman')),
+				
 		('Жанна ''Агузарова'' Продавец',
 		(select top(1) id from userTypes where description like 'Продавец'), 
-		(select top(1) sid from sys.sysusers where name like 'seller'));
+		(select top(1) sid from sys.sysusers where name like 'seller')),
+		
+		('Прокопий Менеджер',
+		(select top(1) id from userTypes where description like 'Менеджер'), 
+		(select top(1) sid from sys.sysusers where name like 'manager'));
 GO
 
 
@@ -455,6 +477,13 @@ BEGIN
 			isSended = 0
 		where ID = @BatchID 
 	end
+	else if((select role from CurrentUserInfo) like 'Кладовщик')
+	begin
+		update batches
+		set placeID = (select top(1) ID from places where description like 'Склад'),
+			isSended = 0
+		where ID = @BatchID 
+	end
 
 	if (@@ROWCOUNT != 1)
 	begin
@@ -556,6 +585,21 @@ FROM	dbo.UsefullBatches RIGHT JOIN
 		dbo.batches ON dbo.UsefullBatches.ID = dbo.batches.ID
 
 WHERE	(dbo.UsefullBatches.[place name] like 'Магазин')
+		and 
+		 isSended = 0
+GO
+
+IF OBJECT_ID(N'[dbo].[StockmanBatches]', N'U') IS NOT NULL 
+DROP VIEW [dbo].[StockmanBatches]
+GO
+CREATE VIEW [dbo].[StockmanBatches]
+AS
+SELECT DISTINCT dbo.UsefullBatches.*
+
+FROM	dbo.UsefullBatches RIGHT JOIN
+		dbo.batches ON dbo.UsefullBatches.ID = dbo.batches.ID
+
+WHERE	(dbo.UsefullBatches.[place name] like 'Склад%')
 		and 
 		 isSended = 0
 GO

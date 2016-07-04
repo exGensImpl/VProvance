@@ -16,8 +16,15 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class DateRenderer extends DefaultTableCellRenderer {
 
-    public DateRenderer() {
+    String _format;
+    
+    public DateRenderer(String format) {
         super();
+        
+        if(format == null)
+            throw new NullPointerException("format");
+        
+        _format = format;
         setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     }
 
@@ -25,7 +32,7 @@ public class DateRenderer extends DefaultTableCellRenderer {
     public void setValue(Object value) {
         if ((value != null) && (value instanceof Date)) {
             Date dateValue = (Date) value;
-            DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+            DateFormat formatter = new SimpleDateFormat(_format);
            
             value = formatter.format(dateValue);
         }
